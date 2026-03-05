@@ -78,7 +78,7 @@ tfoot td{border-top:2px solid var(--bd);font-weight:700;padding-top:13px}
 // ═══════════════════════════════════════════════════════════════
 // After deploying worker.js to Cloudflare Workers, paste the URL below.
 // Example: "https://isa-prices.your-subdomain.workers.dev"
-let WORKER_URL = "https://isaprices.arnavbchowdhury.workers.dev/"
+let WORKER_URL = "https://isaprices.arnavbchowdhury.workers.dev";
 
 // ═══════════════════════════════════════════════════════════════
 // ISA HOLDINGS DATA
@@ -128,9 +128,12 @@ async function refreshPrices(){
       const q=data[h.tk];
       if(q&&q.price>0){
         let p=q.price;
-        // Yahoo returns LSE in GBp (pence). If currency says GBP and ticker is .L, check magnitude.
-        if(h.tk.endsWith(".L")&&q.currency==="GBP"){
-          const s=SNAP[h.tk];if(s&&s>100&&p<s/10)p*=100;
+        // Normalize London-listed stocks to GBX (pence)
+        // Yahoo returns "GBp" = already pence, "GBP" = pounds (needs *100)
+        if(h.tk.endsWith(".L")){
+          if(q.currency==="GBP")p*=100;
+          // Fallback: if currency is something unexpected, check magnitude vs snapshot
+          else if(q.currency!=="GBp"&&q.currency!=="GBX"){const s=SNAP[h.tk];if(s&&s>100&&p<s/20)p*=100;}
         }
         P[h.tk]=p;ok++;
       }else fail++;
@@ -196,15 +199,6 @@ function render(){
     <p class="hero-sub">14 holdings across ${new Set(H.map(x=>x.geo)).size} countries and ${new Set(H.map(x=>x.sec)).size} sectors</p>
     <div class="hero-meta"><span><div class="hdot" style="background:${lr?"var(--ac)":"var(--t5)"}"></div>${lr?"Updated "+new Date(lr).toLocaleString("en-GB"):"Snapshot: 4 Mar 2026"}</span>
     <span><div class="hdot" style="background:var(--bl)"></div>Trading 212 ISA</span></div></div><div class="ctr">`;
-
-  // Worker URL setup (only shows if not configured)
-  if(!WORKER_URL){
-    o+=`<div class="setup-box"><h3>Enable Live Prices</h3>
-      <p>To enable the refresh button, deploy the included <code>worker.js</code> to <a href="https://workers.cloudflare.com" target="_blank" style="color:var(--ac)">Cloudflare Workers</a> (free, 2 min) and paste the URL below. Your visitors will then be able to refresh prices with no login or API key.</p>
-      <input id="wu" type="text" placeholder="https://your-worker.your-subdomain.workers.dev" value="" oninput="this.style.borderColor=this.value?'var(--ac)':'var(--bd)'">
-      <div style="margin-top:10px;display:flex;gap:8px"><button onclick="const v=document.getElementById('wu').value.trim();if(v){WORKER_URL=v;localStorage.setItem('worker_url',v);render();}" style="background:var(--ac);color:#042f2a;border:none;border-radius:6px;padding:7px 16px;cursor:pointer;font-weight:700;font-family:var(--sans);font-size:12px">Save</button>
-      <button onclick="document.querySelector('.setup-box').style.display='none'" style="background:transparent;color:var(--t4);border:1px solid var(--bd);border-radius:6px;padding:7px 16px;cursor:pointer;font-family:var(--sans);font-size:12px">Skip (use snapshot data)</button></div></div>`;
-  }
 
   // Refresh button
   o+=`<div class="rw"><button class="rb ${rfg?"ld":""}" onclick="refreshPrices()" ${rfg?"disabled":""}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg>${rfg?"Refreshing...":"Refresh Prices"}</button>
