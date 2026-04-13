@@ -76,8 +76,6 @@ tfoot td{border-top:2px solid var(--bd);font-weight:700;padding-top:13px}
 // ═══════════════════════════════════════════════════════════════
 // CONFIGURATION - Set your Cloudflare Worker URL here
 // ═══════════════════════════════════════════════════════════════
-// After deploying worker.js to Cloudflare Workers, paste the URL below.
-// Example: "https://isa-prices.your-subdomain.workers.dev"
 let WORKER_URL = "https://isaprices.arnavbchowdhury.workers.dev";
 
 // ═══════════════════════════════════════════════════════════════
@@ -88,20 +86,18 @@ const H=[
 {nm:"Freenet AG",tk:"FNTN.DE",isin:"DE000A0Z2ZZ5",qty:63.117816,cur:"EUR",avg:28.15,sec:"Telecom",geo:"Germany"},
 {nm:"iShares Physical Gold ETC",tk:"SGLN.L",isin:"IE00B4ND3602",qty:30,cur:"GBX",avg:4538.00,sec:"Commodities",geo:"Global"},
 {nm:"Terna Rete Elettrica",tk:"TEZNY",isin:"US88088L1035",qty:56.086556,cur:"USD",avg:27.91,sec:"Utilities",geo:"Italy"},
-{nm:"KSB SE & Co KGaA",tk:"KSB3.DE",isin:"DE0006292030",qty:0.8084155,cur:"EUR",avg:831.42,sec:"Industrials",geo:"Germany"},
 {nm:"NAC Kazatomprom JSC",tk:"KAP",isin:"US63253R2013",qty:30,cur:"USD",avg:43.68,sec:"Energy",geo:"Kazakhstan"},
 {nm:"iShares Physical Silver ETC",tk:"SSLN.L",isin:"IE00B4NCWG09",qty:40,cur:"GBX",avg:2604.00,sec:"Commodities",geo:"Global"},
 {nm:"Invesco Bond Income Plus",tk:"BIPS.L",isin:"JE00B6RMDP68",qty:1200,cur:"GBX",avg:175.15,sec:"Fixed Income",geo:"UK/Global"},
 {nm:"M&G Credit Income Trust",tk:"MGCI.L",isin:"GB00BFYYL325",qty:2100,cur:"GBX",avg:95.07,sec:"Fixed Income",geo:"UK/Global"},
-{nm:"UNITE Group PLC",tk:"UTG.L",isin:"GB0006928617",qty:220,cur:"GBX",avg:682.34,sec:"Real Estate",geo:"UK"},
 {nm:"SPDR EU Small Cap Value ETF",tk:"ZPRX.DE",isin:"IE00BSPLC298",qty:39,cur:"EUR",avg:58.90,sec:"Sm-Cap Value",geo:"Europe"},
 {nm:"Novo Nordisk A/S",tk:"NVO",isin:"DK0062498333",qty:26.5,cur:"EUR",avg:41.97,sec:"Healthcare",geo:"Denmark"},
 {nm:"JPMorgan Asia Growth & Inc",tk:"JAGI.L",isin:"GB0001320778",qty:200,cur:"GBX",avg:451.40,sec:"Asia Equity",geo:"Asia-Pacific"},
 {nm:"TBC Bank Group PLC",tk:"TBCG.L",isin:"GB00BYT18307",qty:27,cur:"GBX",avg:3818.52,sec:"Financials",geo:"Georgia"},
 ];
 
-const DIVS={"FR0000124141":21.68,"DE000A0Z2ZZ5":36.96,"IE00B4ND3602":0,"US88088L1035":28.05,"DE0006292030":17.55,"US63253R2013":37.16,"IE00B4NCWG09":0,"JE00B6RMDP68":73.50,"GB00BFYYL325":78.54,"GB0006928617":23.69,"IE00BSPLC298":0,"DK0062498333":0,"GB0001320778":12.10,"GB00BYT18307":11.10};
-const SNAP={"VIE.PA":33.43,"FNTN.DE":27.82,"SGLN.L":7481,"TEZNY":34.36,"KSB3.DE":1060,"KAP":79.20,"SSLN.L":5970,"BIPS.L":174,"MGCI.L":93.4,"UTG.L":493,"ZPRX.DE":63.89,"NVO":32.89,"JAGI.L":523,"TBCG.L":4490};
+const DIVS={"FR0000124141":21.68,"DE000A0Z2ZZ5":36.96,"IE00B4ND3602":0,"US88088L1035":28.05,"US63253R2013":37.16,"IE00B4NCWG09":0,"JE00B6RMDP68":73.50,"GB00BFYYL325":78.54,"IE00BSPLC298":0,"DK0062498333":0,"GB0001320778":12.10,"GB00BYT18307":11.10};
+const SNAP={"VIE.PA":33.43,"FNTN.DE":27.82,"SGLN.L":7481,"TEZNY":34.36,"KAP":79.20,"SSLN.L":5970,"BIPS.L":174,"MGCI.L":93.4,"ZPRX.DE":63.89,"NVO":32.89,"JAGI.L":523,"TBCG.L":4490};
 const SC={"Utilities":"#63d2c3","Telecom":"#818cf8","Commodities":"#e5a54b","Energy":"#facc15","Industrials":"#fb923c","Fixed Income":"#8694aa","Real Estate":"#a78bfa","Sm-Cap Value":"#f472b6","Healthcare":"#34d399","Asia Equity":"#6fa3f7","Financials":"#60a5fa"};
 const GC={"France":"#63d2c3","Germany":"#818cf8","Global":"#8694aa","Italy":"#34d399","Kazakhstan":"#e5a54b","UK/Global":"#6fa3f7","UK":"#a78bfa","Europe":"#f472b6","Denmark":"#fb923c","Asia-Pacific":"#facc15","Georgia":"#60a5fa"};
 
@@ -128,11 +124,8 @@ async function refreshPrices(){
       const q=data[h.tk];
       if(q&&q.price>0){
         let p=q.price;
-        // Normalize London-listed stocks to GBX (pence)
-        // Yahoo returns "GBp" = already pence, "GBP" = pounds (needs *100)
         if(h.tk.endsWith(".L")){
           if(q.currency==="GBP")p*=100;
-          // Fallback: if currency is something unexpected, check magnitude vs snapshot
           else if(q.currency!=="GBp"&&q.currency!=="GBX"){const s=SNAP[h.tk];if(s&&s>100&&p<s/20)p*=100;}
         }
         P[h.tk]=p;ok++;
@@ -194,18 +187,15 @@ function pleg(data){return data.map(d=>`<div class="pr"><div class="psw" style="
 function render(){
   const D=calc();
   let o="";
-  // Hero
   o+=`<div class="hero"><p class="hero-ey">Stocks &amp; Shares ISA</p><h1>Arnav's <i>Portfolio</i></h1>
-    <p class="hero-sub">14 holdings across ${new Set(H.map(x=>x.geo)).size} countries and ${new Set(H.map(x=>x.sec)).size} sectors</p>
+    <p class="hero-sub">${H.length} holdings across ${new Set(H.map(x=>x.geo)).size} countries and ${new Set(H.map(x=>x.sec)).size} sectors</p>
     <div class="hero-meta"><span><div class="hdot" style="background:${lr?"var(--ac)":"var(--t5)"}"></div>${lr?"Updated "+new Date(lr).toLocaleString("en-GB"):"Snapshot: 4 Mar 2026"}</span>
     <span><div class="hdot" style="background:var(--bl)"></div>Trading 212 ISA</span></div></div><div class="ctr">`;
 
-  // Refresh button
   o+=`<div class="rw"><button class="rb ${rfg?"ld":""}" onclick="refreshPrices()" ${rfg?"disabled":""}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg>${rfg?"Refreshing...":"Refresh Prices"}</button>
     <div class="rs">${rfg?esc(rmsg):(lr?"Live via Yahoo Finance":"Using snapshot prices from 4 Mar 2026")}</div></div>`;
   if(rerr)o+=`<div class="al ${rerr.includes("fail")?"al-e":"al-w"}" style="max-width:560px;margin:0 auto 14px">${esc(rerr)}</div>`;
 
-  // Nav
   o+=`<div class="nav"><button class="nb ${vw==="overview"?"on":""}" onclick="vw='overview';render()">Overview</button><button class="nb ${vw==="holdings"?"on":""}" onclick="vw='holdings';render()">Holdings</button><button class="nb ${vw==="analysis"?"on":""}" onclick="vw='analysis';render()">Analysis</button></div>`;
 
   if(vw==="overview")o+=rOv(D);else if(vw==="holdings")o+=rHo(D);else o+=rAn(D);
@@ -220,7 +210,7 @@ function rOv(D){
     <div class="sc"><div class="sl">Dividends</div><div class="sv" style="color:var(--bl)">${F(D.td)}</div><div class="ss" style="color:var(--t4)">Net WHT, since Mar '25</div></div>
     <div class="sc"><div class="sl">Total Return</div><div class="sv" style="color:${cl(D.ttp)}">${F(D.ttp)}</div><div class="ss" style="color:${cl(D.ttpp)}">${pf(D.ttpp)}</div></div>
     <div class="sc"><div class="sl">Dividend Yield</div><div class="sv" style="color:var(--bl)">${D.dy.toFixed(2)}%</div><div class="ss" style="color:var(--t4)">Trailing 12m</div></div>
-    <div class="sc"><div class="sl">Positions</div><div class="sv" style="color:#f4f7fb">14</div><div class="ss" style="color:var(--t4)">Top 5 = ${D.t5.toFixed(0)}%</div></div></div>`;
+    <div class="sc"><div class="sl">Positions</div><div class="sv" style="color:#f4f7fb">${H.length}</div><div class="ss" style="color:var(--t4)">Top 5 = ${D.t5.toFixed(0)}%</div></div></div>`;
   o+=`<div class="g2"><div class="cd"><div class="ch"><span class="ct">Sector Allocation</span><span class="cb">${D.secs.length} sectors</span></div><div class="pc">${pie(D.secs)}<div class="pl">${pleg(D.secs)}</div></div></div>`;
   o+=`<div class="cd"><div class="ch"><span class="ct">Geographic Exposure</span><span class="cb">${D.geos.length} regions</span></div><div class="pc">${pie(D.geos)}<div class="pl">${pleg(D.geos)}</div></div></div></div>`;
   const bm=Math.max(...D.byR.map(r=>Math.abs(r.totPct)),.01);
@@ -243,15 +233,15 @@ function rHo(D){
     <td style="font-family:var(--mono);font-size:10.5px">${r.cp.toFixed(2)} <span style="color:var(--t5);font-size:8.5px">${r.cur}</span></td>
     <td style="font-family:var(--mono);font-size:10.5px;color:var(--t3)">${r.wt.toFixed(1)}%</td>
     <td style="font-family:var(--mono);font-size:10.5px;font-weight:500">${F(r.mkt)}</td>
-    <td style="font-family:var(--mono);font-size:10.5px;color:${cl(r.capPnl)}">${F(r.capPnl)}<br><span style="font-size:9.5px">${pf(r.capPct)}</span></td>
+    <td style="font-family:var(--mono);font-size:10.5px;color:${cl(r.capPnl)}">${F(r.capPnl)}<span style="font-size:9.5px"><br>${pf(r.capPct)}</span></td>
     <td style="font-family:var(--mono);font-size:10.5px;color:${r.divs>0?"var(--bl)":"var(--t5)"}">${r.divs>0?F(r.divs):"—"}</td>
-    <td style="font-family:var(--mono);font-size:11px;font-weight:600;color:${cl(r.totPnl)}">${F(r.totPnl)}<br><span style="font-size:10px">${pf(r.totPct)}</span></td></tr>`;
+    <td style="font-family:var(--mono);font-size:11px;font-weight:600;color:${cl(r.totPnl)}">${F(r.totPnl)}<span style="font-size:10px"><br>${pf(r.totPct)}</span></td></tr>`;
   });
   o+=`</tbody><tfoot><tr><td colspan="7" style="color:var(--t3);font-size:11px">TOTAL</td>
     <td style="font-family:var(--mono);font-size:11.5px">${F(D.tv)}</td>
-    <td style="font-family:var(--mono);font-size:11.5px;color:${cl(D.tcp)}">${F(D.tcp)}<br><span style="font-size:10px">${pf(D.tcpp)}</span></td>
+    <td style="font-family:var(--mono);font-size:11.5px;color:${cl(D.tcp)}">${F(D.tcp)}<span style="font-size:10px"><br>${pf(D.tcpp)}</span></td>
     <td style="font-family:var(--mono);font-size:11.5px;color:var(--bl)">${F(D.td)}</td>
-    <td style="font-family:var(--mono);font-size:11.5px;color:${cl(D.ttp)}">${F(D.ttp)}<br><span style="font-size:10px">${pf(D.ttpp)}</span></td></tr></tfoot>`;
+    <td style="font-family:var(--mono);font-size:11.5px;color:${cl(D.ttp)}">${F(D.ttp)}<span style="font-size:10px"><br>${pf(D.ttpp)}</span></td></tr></tfoot>`;
   o+=`</table></div><p style="font-size:10.5px;color:var(--t5);margin-top:14px">Dividends net of WHT, Mar 2025 to Mar 2026. FX: 1 EUR = ${fx.EUR.toFixed(4)} GBP, 1 USD = ${fx.USD.toFixed(4)} GBP${lr?" (live)":" (snapshot)"}.</p></div>`;
   return o;
 }
@@ -277,9 +267,9 @@ function rAn(D){
   o+=`<div><div style="font-size:10px;color:var(--t5);text-transform:uppercase;letter-spacing:1px;margin-bottom:9px;font-weight:600">Return Metrics</div>`;
   o+=mr("Total Return (£)",F(D.ttp),cl(D.ttp))+mr("Total Return (%)",pf(D.ttpp),cl(D.ttpp))+mr("Capital Gain",pf(D.tcpp),cl(D.tcpp))+mr("Income Return",D.dy.toFixed(2)+"%","var(--bl)")+`</div>`;
   o+=`<div><div style="font-size:10px;color:var(--t5);text-transform:uppercase;letter-spacing:1px;margin-bottom:9px;font-weight:600">Diversification</div>`;
-  o+=mr("Holdings","14","var(--t)")+mr("Sectors",String(D.secs.length),"var(--t)")+mr("Geographies",String(D.geos.length),"var(--t)")+mr("Top-5 Concentration",D.t5.toFixed(1)+"%","var(--am)")+`</div>`;
+  o+=mr("Holdings",String(H.length),"var(--t)")+mr("Sectors",String(D.secs.length),"var(--t)")+mr("Geographies",String(D.geos.length),"var(--t)")+mr("Top-5 Concentration",D.t5.toFixed(1)+"%","var(--am)")+`</div>`;
   o+=`<div><div style="font-size:10px;color:var(--t5);text-transform:uppercase;letter-spacing:1px;margin-bottom:9px;font-weight:600">Income</div>`;
-  o+=mr("Total Dividends",F(D.td),"var(--bl)")+mr("Dividend Payers",dp.length+" of 14","var(--t)")+mr("Avg Per Payer",F(D.td/Math.max(dp.length,1)),"var(--bl)")+mr("Largest Payer",esc(dp[0]?.nm||"—"),"var(--t2)")+`</div>`;
+  o+=mr("Total Dividends",F(D.td),"var(--bl)")+mr("Dividend Payers",dp.length+" of "+H.length,"var(--t)")+mr("Avg Per Payer",F(D.td/Math.max(dp.length,1)),"var(--bl)")+mr("Largest Payer",esc(dp[0]?.nm||"—"),"var(--t2)")+`</div>`;
   o+=`</div></div>`;return o;
 }
 
