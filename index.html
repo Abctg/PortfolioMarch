@@ -82,29 +82,37 @@ let WORKER_URL = "https://isaprices.arnavbchowdhury.workers.dev";
 // ISA HOLDINGS DATA
 // ═══════════════════════════════════════════════════════════════
 const H=[
-{nm:"Veolia Environnement SA",tk:"VIE.PA",isin:"FR0000124141",qty:62.0390135,cur:"EUR",avg:29.22,sec:"Utilities",geo:"France"},
-{nm:"Freenet AG",tk:"FNTN.DE",isin:"DE000A0Z2ZZ5",qty:63.117816,cur:"EUR",avg:28.15,sec:"Telecom",geo:"Germany"},
-{nm:"iShares Physical Gold ETC",tk:"SGLN.L",isin:"IE00B4ND3602",qty:30,cur:"GBX",avg:4538.00,sec:"Commodities",geo:"Global"},
-{nm:"Terna Rete Elettrica",tk:"TEZNY",isin:"US88088L1035",qty:56.086556,cur:"USD",avg:27.91,sec:"Utilities",geo:"Italy"},
-{nm:"NAC Kazatomprom JSC",tk:"KAP",isin:"US63253R2013",qty:30,cur:"USD",avg:43.68,sec:"Energy",geo:"Kazakhstan"},
-{nm:"iShares Physical Silver ETC",tk:"SSLN.L",isin:"IE00B4NCWG09",qty:40,cur:"GBX",avg:2604.00,sec:"Commodities",geo:"Global"},
-{nm:"Invesco Bond Income Plus",tk:"BIPS.L",isin:"JE00B6RMDP68",qty:1200,cur:"GBX",avg:175.15,sec:"Fixed Income",geo:"UK/Global"},
-{nm:"M&G Credit Income Trust",tk:"MGCI.L",isin:"GB00BFYYL325",qty:2100,cur:"GBX",avg:95.07,sec:"Fixed Income",geo:"UK/Global"},
-{nm:"SPDR EU Small Cap Value ETF",tk:"ZPRX.DE",isin:"IE00BSPLC298",qty:39,cur:"EUR",avg:58.90,sec:"Sm-Cap Value",geo:"Europe"},
-{nm:"Novo Nordisk A/S",tk:"NVO",isin:"DK0062498333",qty:26.5,cur:"EUR",avg:41.97,sec:"Healthcare",geo:"Denmark"},
-{nm:"JPMorgan Asia Growth & Inc",tk:"JAGI.L",isin:"GB0001320778",qty:200,cur:"GBX",avg:451.40,sec:"Asia Equity",geo:"Asia-Pacific"},
-{nm:"TBC Bank Group PLC",tk:"TBCG.L",isin:"GB00BYT18307",qty:27,cur:"GBX",avg:3818.52,sec:"Financials",geo:"Georgia"},
+{nm:"Veolia Environnement SA",tk:"VIE.PA",isin:"FR0000124141",qty:84.0390135,cur:"EUR",avg:31.03,sec:"Utilities",geo:"France"},
+{nm:"iShares Physical Gold ETC",tk:"SGLN.L",isin:"IE00B4ND3602",qty:40,cur:"GBX",avg:4900.00,sec:"Commodities",geo:"Global"},
+{nm:"Terna Rete Elettrica",tk:"TEZNY",isin:"US88088L1035",qty:92.086556,cur:"USD",avg:29.60,sec:"Utilities",geo:"Italy"},
+{nm:"NAC Kazatomprom JSC",tk:"KAP.L",isin:"US63253R2013",qty:54,cur:"USD",avg:54.00,sec:"Energy",geo:"Kazakhstan"},
+{nm:"iShares Physical Silver ETC",tk:"SSLN.L",isin:"IE00B4NCWG09",qty:64,cur:"GBX",avg:3460.80,sec:"Commodities",geo:"Global"},
+{nm:"Invesco Bond Income Plus",tk:"BIPS.L",isin:"JE00B6RMDP68",qty:1600,cur:"GBX",avg:174.61,sec:"Fixed Income",geo:"UK/Global"},
+{nm:"M&G Credit Income Trust",tk:"MGCI.L",isin:"GB00BFYYL325",qty:2250,cur:"GBX",avg:95.00,sec:"Fixed Income",geo:"UK/Global"},
+{nm:"SPDR EU Small Cap Value ETF",tk:"ZPRX.DE",isin:"IE00BSPLC298",qty:49,cur:"EUR",avg:60.53,sec:"Sm-Cap Value",geo:"Europe"},
+{nm:"Novo Nordisk A/S",tk:"NOV.DE",isin:"DK0062498333",qty:68.5,cur:"EUR",avg:42.00,sec:"Healthcare",geo:"Denmark"},
+{nm:"JPMorgan Asia Growth & Inc",tk:"JAGI.L",isin:"GB0001320778",qty:520,cur:"GBX",avg:519.80,sec:"Asia Equity",geo:"Asia-Pacific"},
+{nm:"TBC Bank Group PLC",tk:"TBCG.L",isin:"GB00BYT18307",qty:60.21488469,cur:"GBX",avg:4212.70,sec:"Financials",geo:"Georgia"},
+{nm:"General Dynamics Corp",tk:"GD",isin:"US3695501086",qty:8.5,cur:"USD",avg:344.00,sec:"Defence",geo:"USA"},
+{nm:"Theon International PLC",tk:"THEON.AS",isin:"CY0200751713",qty:97.67477369,cur:"EUR",avg:32.04,sec:"Defence",geo:"Greece"},
+{nm:"Adobe Inc",tk:"ADBE",isin:"US00724F1012",qty:14.5,cur:"USD",avg:214.19,sec:"Technology",geo:"USA"},
+{nm:"Eldorado Gold Corp",tk:"EGO",isin:"CA2849025093",qty:135,cur:"USD",avg:31.84,sec:"Materials",geo:"Canada"},
+{nm:"Kinsale Capital Group",tk:"KNSL",isin:"US49714P1084",qty:12.5,cur:"USD",avg:328.67,sec:"Financials",geo:"USA"},
+{nm:"iShares S&P 500 Equal Weight",tk:"EWSP.L",isin:"IE000MLMNYS0",qty:500,cur:"GBP",avg:5.835,sec:"US Equity",geo:"USA"},
+{nm:"AlzChem Group AG",tk:"ACT.DE",isin:"DE000A2YNT30",qty:8,cur:"EUR",avg:168.40,sec:"Materials",geo:"Germany"},
+{nm:"Adyen NV",tk:"ADYEN.AS",isin:"NL0012969182",qty:4,cur:"EUR",avg:817.40,sec:"Technology",geo:"Netherlands"},
 ];
 
-const DIVS={"FR0000124141":21.68,"DE000A0Z2ZZ5":36.96,"IE00B4ND3602":0,"US88088L1035":28.05,"US63253R2013":37.16,"IE00B4NCWG09":0,"JE00B6RMDP68":73.50,"GB00BFYYL325":78.54,"IE00BSPLC298":0,"DK0062498333":0,"GB0001320778":12.10,"GB00BYT18307":11.10};
-const SNAP={"VIE.PA":33.43,"FNTN.DE":27.82,"SGLN.L":7481,"TEZNY":34.36,"KAP":79.20,"SSLN.L":5970,"BIPS.L":174,"MGCI.L":93.4,"ZPRX.DE":63.89,"NVO":32.89,"JAGI.L":523,"TBCG.L":4490};
-const SC={"Utilities":"#63d2c3","Telecom":"#818cf8","Commodities":"#e5a54b","Energy":"#facc15","Industrials":"#fb923c","Fixed Income":"#8694aa","Real Estate":"#a78bfa","Sm-Cap Value":"#f472b6","Healthcare":"#34d399","Asia Equity":"#6fa3f7","Financials":"#60a5fa"};
-const GC={"France":"#63d2c3","Germany":"#818cf8","Global":"#8694aa","Italy":"#34d399","Kazakhstan":"#e5a54b","UK/Global":"#6fa3f7","UK":"#a78bfa","Europe":"#f472b6","Denmark":"#fb923c","Asia-Pacific":"#facc15","Georgia":"#60a5fa"};
+// Forward annual dividend YIELD (decimal) by ISIN. Income = yield x market value.
+const YLD={"FR0000124141":.045,"IE00B4ND3602":0,"US88088L1035":.045,"US63253R2013":.05,"IE00B4NCWG09":0,"JE00B6RMDP68":.07,"GB00BFYYL325":.08,"IE00BSPLC298":0,"DK0062498333":.03,"GB0001320778":0,"GB00BYT18307":.06,"US3695501086":.015,"CY0200751713":0,"US00724F1012":0,"CA2849025093":.01,"US49714P1084":.0025,"IE000MLMNYS0":0,"DE000A2YNT30":.01,"NL0012969182":0};
+const SNAP={"VIE.PA":35.8,"SGLN.L":5911,"TEZNY":34.72,"KAP.L":64.1,"SSLN.L":4134,"BIPS.L":170,"MGCI.L":91.5,"ZPRX.DE":69.9,"NOV.DE":44.15,"JAGI.L":550,"TBCG.L":4800,"GD":384,"THEON.AS":32.54,"ADBE":246.83,"EGO":32.84,"KNSL":355.87,"EWSP.L":5.779,"ACT.DE":153.9,"ADYEN.AS":885.2};
+const SC={"Utilities":"#63d2c3","Commodities":"#e5a54b","Energy":"#facc15","Fixed Income":"#8694aa","Sm-Cap Value":"#f472b6","Healthcare":"#34d399","Asia Equity":"#6fa3f7","Financials":"#60a5fa","Defence":"#fb7185","Technology":"#a78bfa","Materials":"#fb923c","US Equity":"#818cf8"};
+const GC={"France":"#63d2c3","Germany":"#818cf8","Global":"#8694aa","Italy":"#34d399","Kazakhstan":"#e5a54b","UK/Global":"#6fa3f7","Europe":"#f472b6","Denmark":"#fb923c","Netherlands":"#e879f9","Greece":"#fbbf24","Asia-Pacific":"#facc15","Georgia":"#38bdf8","USA":"#a78bfa","Canada":"#f87171"};
 
 // ═══════════════════════════════════════════════════════════════
 // STATE
 // ═══════════════════════════════════════════════════════════════
-let P={...SNAP},fx={EUR:.838,USD:.785,GBX:.01,GBP:1},lr=null,rfg=false,rmsg="",rerr="",vw="overview";
+let P={...SNAP},fx={EUR:.864,USD:.7416,GBX:.01,GBP:1},lr=null,rfg=false,rmsg="",rerr="",vw="overview";
 
 // ═══════════════════════════════════════════════════════════════
 // PRICE REFRESH via Cloudflare Worker
@@ -148,7 +156,7 @@ function toG(v,cur){return cur==="GBP"?v:(cur==="GBX"||cur==="GBp")?v*.01:cur===
 function calc(){
   const R=H.map(h=>{
     const cp=P[h.tk]||SNAP[h.tk]||0,mkt=toG(h.qty*cp,h.cur),cost=toG(h.qty*h.avg,h.cur);
-    const capPnl=mkt-cost,capPct=cost>0?capPnl/cost*100:0,divs=DIVS[h.isin]||0;
+    const capPnl=mkt-cost,capPct=cost>0?capPnl/cost*100:0,divs=mkt*(YLD[h.isin]||0);
     const totPnl=capPnl+divs,totPct=cost>0?totPnl/cost*100:0;
     return{...h,cp,mkt,cost,capPnl,capPct,divs,totPnl,totPct,wt:0};
   });
@@ -189,11 +197,11 @@ function render(){
   let o="";
   o+=`<div class="hero"><p class="hero-ey">Stocks &amp; Shares ISA</p><h1>Arnav's <i>Portfolio</i></h1>
     <p class="hero-sub">${H.length} holdings across ${new Set(H.map(x=>x.geo)).size} countries and ${new Set(H.map(x=>x.sec)).size} sectors</p>
-    <div class="hero-meta"><span><div class="hdot" style="background:${lr?"var(--ac)":"var(--t5)"}"></div>${lr?"Updated "+new Date(lr).toLocaleString("en-GB"):"Snapshot: 4 Mar 2026"}</span>
+    <div class="hero-meta"><span><div class="hdot" style="background:${lr?"var(--ac)":"var(--t5)"}"></div>${lr?"Updated "+new Date(lr).toLocaleString("en-GB"):"Snapshot: 30 Jul 2026"}</span>
     <span><div class="hdot" style="background:var(--bl)"></div>Trading 212 ISA</span></div></div><div class="ctr">`;
 
   o+=`<div class="rw"><button class="rb ${rfg?"ld":""}" onclick="refreshPrices()" ${rfg?"disabled":""}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg>${rfg?"Refreshing...":"Refresh Prices"}</button>
-    <div class="rs">${rfg?esc(rmsg):(lr?"Live via Yahoo Finance":"Using snapshot prices from 4 Mar 2026")}</div></div>`;
+    <div class="rs">${rfg?esc(rmsg):(lr?"Live via Yahoo Finance":"Using snapshot prices from 30 Jul 2026")}</div></div>`;
   if(rerr)o+=`<div class="al ${rerr.includes("fail")?"al-e":"al-w"}" style="max-width:560px;margin:0 auto 14px">${esc(rerr)}</div>`;
 
   o+=`<div class="nav"><button class="nb ${vw==="overview"?"on":""}" onclick="vw='overview';render()">Overview</button><button class="nb ${vw==="holdings"?"on":""}" onclick="vw='holdings';render()">Holdings</button><button class="nb ${vw==="analysis"?"on":""}" onclick="vw='analysis';render()">Analysis</button></div>`;
@@ -207,9 +215,9 @@ function rOv(D){
   let o=`<div class="sg">
     <div class="sc"><div class="sl">Market Value</div><div class="sv" style="color:#f4f7fb">${F(D.tv)}</div><div class="ss" style="color:var(--t4)">Cost: ${F(D.tc)}</div></div>
     <div class="sc"><div class="sl">Capital P&amp;L</div><div class="sv" style="color:${cl(D.tcp)}">${F(D.tcp)}</div><div class="ss" style="color:${cl(D.tcpp)}">${pf(D.tcpp)}</div></div>
-    <div class="sc"><div class="sl">Dividends</div><div class="sv" style="color:var(--bl)">${F(D.td)}</div><div class="ss" style="color:var(--t4)">Net WHT, since Mar '25</div></div>
+    <div class="sc"><div class="sl">Est. Annual Income</div><div class="sv" style="color:var(--bl)">${F(D.td)}</div><div class="ss" style="color:var(--t4)">Yield-based, forward</div></div>
     <div class="sc"><div class="sl">Total Return</div><div class="sv" style="color:${cl(D.ttp)}">${F(D.ttp)}</div><div class="ss" style="color:${cl(D.ttpp)}">${pf(D.ttpp)}</div></div>
-    <div class="sc"><div class="sl">Dividend Yield</div><div class="sv" style="color:var(--bl)">${D.dy.toFixed(2)}%</div><div class="ss" style="color:var(--t4)">Trailing 12m</div></div>
+    <div class="sc"><div class="sl">Dividend Yield</div><div class="sv" style="color:var(--bl)">${D.dy.toFixed(2)}%</div><div class="ss" style="color:var(--t4)">Weighted, forward</div></div>
     <div class="sc"><div class="sl">Positions</div><div class="sv" style="color:#f4f7fb">${H.length}</div><div class="ss" style="color:var(--t4)">Top 5 = ${D.t5.toFixed(0)}%</div></div></div>`;
   o+=`<div class="g2"><div class="cd"><div class="ch"><span class="ct">Sector Allocation</span><span class="cb">${D.secs.length} sectors</span></div><div class="pc">${pie(D.secs)}<div class="pl">${pleg(D.secs)}</div></div></div>`;
   o+=`<div class="cd"><div class="ch"><span class="ct">Geographic Exposure</span><span class="cb">${D.geos.length} regions</span></div><div class="pc">${pie(D.geos)}<div class="pl">${pleg(D.geos)}</div></div></div></div>`;
@@ -242,7 +250,7 @@ function rHo(D){
     <td style="font-family:var(--mono);font-size:11.5px;color:${cl(D.tcp)}">${F(D.tcp)}<span style="font-size:10px"><br>${pf(D.tcpp)}</span></td>
     <td style="font-family:var(--mono);font-size:11.5px;color:var(--bl)">${F(D.td)}</td>
     <td style="font-family:var(--mono);font-size:11.5px;color:${cl(D.ttp)}">${F(D.ttp)}<span style="font-size:10px"><br>${pf(D.ttpp)}</span></td></tr></tfoot>`;
-  o+=`</table></div><p style="font-size:10.5px;color:var(--t5);margin-top:14px">Dividends net of WHT, Mar 2025 to Mar 2026. FX: 1 EUR = ${fx.EUR.toFixed(4)} GBP, 1 USD = ${fx.USD.toFixed(4)} GBP${lr?" (live)":" (snapshot)"}.</p></div>`;
+  o+=`</table></div><p style="font-size:10.5px;color:var(--t5);margin-top:14px">Divs = forward annual income estimate (yield × market value). FX: 1 EUR = ${fx.EUR.toFixed(4)} GBP, 1 USD = ${fx.USD.toFixed(4)} GBP${lr?" (live)":" (snapshot)"}.</p></div>`;
   return o;
 }
 
