@@ -123,7 +123,11 @@ async function refreshPrices(){
   rfg=true;rerr="";rmsg="Fetching live prices...";render();
   try{
     const tks=H.map(h=>h.tk).join(",");
-    const resp=await fetch(`${WORKER_URL}?symbols=${encodeURIComponent(tks)}`,{signal:AbortSignal.timeout(20000)});
+    const url=`${WORKER_URL}?symbols=${encodeURIComponent(tks)}`;
+    const resp=await Promise.race([
+      fetch(url),
+      new Promise((_,rej)=>setTimeout(()=>rej(new Error("timed out after 20s")),20000))
+    ]);
     if(!resp.ok)throw new Error("Worker returned "+resp.status);
     const data=await resp.json();
     if(data.error)throw new Error(data.error);
@@ -132,9 +136,14 @@ async function refreshPrices(){
       const q=data[h.tk];
       if(q&&q.price>0){
         let p=q.price;
-        if(h.tk.endsWith(".L")){
+        if(h.cur==="GBX"){
+          // stored in pence; Yahoo sometimes quotes this line in pounds
           if(q.currency==="GBP")p*=100;
           else if(q.currency!=="GBp"&&q.currency!=="GBX"){const s=SNAP[h.tk];if(s&&s>100&&p<s/20)p*=100;}
+        }else if(h.cur==="GBP"){
+          // stored in pounds; Yahoo sometimes quotes this line in pence
+          if(q.currency==="GBp"||q.currency==="GBX")p/=100;
+          else{const s=SNAP[h.tk];if(s&&p>s*20)p/=100;}
         }
         P[h.tk]=p;ok++;
       }else fail++;
