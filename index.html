@@ -82,8 +82,8 @@ let WORKER_URL = "https://isaprices.arnavbchowdhury.workers.dev";
 // ISA HOLDINGS DATA
 // ═══════════════════════════════════════════════════════════════
 const H=[
-{nm:"Veolia Environnement SA",tk:"VIE.PA",isin:"FR0000124141",qty:84.0390135,cur:"EUR",avg:31.03,sec:"Utilities",geo:"France"},
-{nm:"iShares Physical Gold ETC",tk:"SGLN.L",isin:"IE00B4ND3602",qty:40,cur:"GBX",avg:4900.00,sec:"Commodities",geo:"Global"},
+{nm:"Veolia Environnement SA",tk:"VIE.PA",isin:"FR0000124141",qty:99.039,cur:"EUR",avg:31.20,sec:"Utilities",geo:"France"},
+{nm:"iShares Physical Gold ETC",tk:"SGLN.L",isin:"IE00B4ND3602",qty:42,cur:"GBX",avg:4942.00,sec:"Commodities",geo:"Global"},
 {nm:"Terna Rete Elettrica",tk:"TEZNY",isin:"US88088L1035",qty:92.086556,cur:"USD",avg:29.60,sec:"Utilities",geo:"Italy"},
 {nm:"NAC Kazatomprom JSC",tk:"KAP.L",isin:"US63253R2013",qty:54,cur:"USD",avg:54.00,sec:"Energy",geo:"Kazakhstan"},
 {nm:"iShares Physical Silver ETC",tk:"SSLN.L",isin:"IE00B4NCWG09",qty:64,cur:"GBX",avg:3460.80,sec:"Commodities",geo:"Global"},
@@ -99,12 +99,12 @@ const H=[
 {nm:"Eldorado Gold Corp",tk:"EGO",isin:"CA2849025093",qty:135,cur:"USD",avg:31.84,sec:"Materials",geo:"Canada"},
 {nm:"Kinsale Capital Group",tk:"KNSL",isin:"US49714P1084",qty:12.5,cur:"USD",avg:328.67,sec:"Financials",geo:"USA"},
 {nm:"iShares S&P 500 Equal Weight",tk:"EWSP.L",isin:"IE000MLMNYS0",qty:500,cur:"GBP",avg:5.835,sec:"US Equity",geo:"USA"},
-{nm:"AlzChem Group AG",tk:"ACT.DE",isin:"DE000A2YNT30",qty:8,cur:"EUR",avg:168.40,sec:"Materials",geo:"Germany"},
+{nm:"AlzChem Group AG",tk:"ACT.DE",isin:"DE000A2YNT30",qty:18,cur:"EUR",avg:163.60,sec:"Materials",geo:"Germany"},
 {nm:"Adyen NV",tk:"ADYEN.AS",isin:"NL0012969182",qty:4,cur:"EUR",avg:817.40,sec:"Technology",geo:"Netherlands"},
 ];
 
 // Forward annual dividend YIELD (decimal) by ISIN. Income = yield x market value.
-const YLD={"FR0000124141":.045,"IE00B4ND3602":0,"US88088L1035":.045,"US63253R2013":.05,"IE00B4NCWG09":0,"JE00B6RMDP68":.07,"GB00BFYYL325":.08,"IE00BSPLC298":0,"DK0062498333":.03,"GB0001320778":0,"GB00BYT18307":.06,"US3695501086":.015,"CY0200751713":0,"US00724F1012":0,"CA2849025093":.01,"US49714P1084":.0025,"IE000MLMNYS0":0,"DE000A2YNT30":.01,"NL0012969182":0};
+const YLD={"FR0000124141":.045,"IE00B4ND3602":0,"US88088L1035":.045,"US63253R2013":.05,"IE00B4NCWG09":0,"JE00B6RMDP68":.07,"GB00BFYYL325":.08,"IE00BSPLC298":0,"DK0062498333":.03,"GB0001320778":.04,"GB00BYT18307":.06,"US3695501086":.015,"CY0200751713":0,"US00724F1012":0,"CA2849025093":.01,"US49714P1084":.0025,"IE000MLMNYS0":0,"DE000A2YNT30":.01,"NL0012969182":0};
 const SNAP={"VIE.PA":35.8,"SGLN.L":5911,"TEZNY":34.72,"KAP.L":64.1,"SSLN.L":4134,"BIPS.L":170,"MGCI.L":91.5,"ZPRX.DE":69.9,"NOV.DE":44.15,"JAGI.L":550,"TBCG.L":4800,"GD":384,"THEON.AS":32.54,"ADBE":246.83,"EGO":32.84,"KNSL":355.87,"EWSP.L":5.779,"ACT.DE":153.9,"ADYEN.AS":885.2};
 const SC={"Utilities":"#63d2c3","Commodities":"#e5a54b","Energy":"#facc15","Fixed Income":"#8694aa","Sm-Cap Value":"#f472b6","Healthcare":"#34d399","Asia Equity":"#6fa3f7","Financials":"#60a5fa","Defence":"#fb7185","Technology":"#a78bfa","Materials":"#fb923c","US Equity":"#818cf8"};
 const GC={"France":"#63d2c3","Germany":"#818cf8","Global":"#8694aa","Italy":"#34d399","Kazakhstan":"#e5a54b","UK/Global":"#6fa3f7","Europe":"#f472b6","Denmark":"#fb923c","Netherlands":"#e879f9","Greece":"#fbbf24","Asia-Pacific":"#facc15","Georgia":"#38bdf8","USA":"#a78bfa","Canada":"#f87171"};
