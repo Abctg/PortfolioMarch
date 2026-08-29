@@ -66,6 +66,24 @@ tfoot td{border-top:2px solid var(--bd);font-weight:700;padding-top:13px}
 .setup-box code{background:var(--bg);padding:2px 7px;border-radius:4px;font-family:var(--mono);font-size:11.5px;color:var(--ac)}
 .setup-box input{width:100%;background:var(--bg);border:1px solid var(--bd);color:var(--t);border-radius:6px;padding:9px 12px;font-size:12.5px;font-family:var(--mono);outline:none;margin-top:6px}
 .setup-box input:focus{border-color:var(--ac)}
+.irr{background:linear-gradient(135deg,var(--bg2) 0%,var(--bg3) 55%,#10241f 100%);border:1px solid var(--bd2);border-radius:var(--r);padding:24px 26px;margin-bottom:12px;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:space-between;gap:22px;flex-wrap:wrap}
+.irr::after{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(99,210,195,.3),transparent)}
+.irr::before{content:'';position:absolute;right:-70px;top:-70px;width:280px;height:280px;background:radial-gradient(circle,rgba(99,210,195,.07),transparent 68%);pointer-events:none}
+.irr-m{display:flex;flex-direction:column;gap:2px;min-width:200px}
+.irr-l{font-size:10px;color:var(--ac);text-transform:uppercase;letter-spacing:1.6px;font-weight:700;opacity:.8}
+.irr-v{font-family:var(--mono);font-size:clamp(38px,8vw,54px);font-weight:600;letter-spacing:-2.5px;line-height:1.02}
+.irr-s{font-size:11.5px;color:var(--t4);margin-top:3px}
+.irr-r{display:flex;gap:26px;flex-wrap:wrap}
+.irr-i{display:flex;flex-direction:column;gap:3px}
+.irr-ik{font-size:9.5px;color:var(--t5);text-transform:uppercase;letter-spacing:1px;font-weight:600}
+.irr-iv{font-family:var(--mono);font-size:16px;font-weight:600}
+.tog{display:inline-flex;gap:2px;background:var(--bg);border:1px solid var(--bd);border-radius:8px;padding:2px}
+.tog button{background:transparent;border:none;color:var(--t4);font-family:var(--sans);font-size:11px;font-weight:500;padding:5px 12px;border-radius:6px;cursor:pointer;transition:all .2s;white-space:nowrap}
+.tog button.on{background:var(--acbg);color:var(--ac);font-weight:600}
+.seg{display:flex;height:26px;border-radius:5px;overflow:hidden;margin:10px 0 6px}
+.seg div{display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:10px;font-weight:600;color:#04070d}
+.note{font-size:10.5px;color:var(--t5);line-height:1.6;margin-top:12px}
+@media(max-width:600px){.irr{padding:20px 18px;gap:16px}.irr-r{gap:18px}}
 @media(max-width:768px){.g2{grid-template-columns:1fr}.sg{grid-template-columns:repeat(2,1fr)}.bl{width:95px;font-size:10px}.ctr{padding:0 12px 50px}.hero{padding:32px 0 20px}table{font-size:10.5px}th,td{padding:7px 4px}}
 @media(max-width:480px){.sg{grid-template-columns:1fr}.pc{flex-direction:column;align-items:flex-start}.hero-meta{flex-direction:column;gap:8px}}
 </style>
@@ -112,10 +130,39 @@ const SC={"Utilities":"#63d2c3","Commodities":"#e5a54b","Energy":"#facc15","Fixe
 const GC={"France":"#63d2c3","Germany":"#818cf8","Global":"#8694aa","Italy":"#34d399","Kazakhstan":"#e5a54b","UK/Global":"#6fa3f7","Europe":"#f472b6","Denmark":"#fb923c","Netherlands":"#e879f9","Greece":"#fbbf24","Asia-Pacific":"#facc15","Georgia":"#38bdf8","USA":"#a78bfa","Canada":"#f87171"};
 
 // ═══════════════════════════════════════════════════════════════
+// CASH, CONTRIBUTIONS & BENCHMARK
+// ═══════════════════════════════════════════════════════════════
+const SNAP_DATE = "2026-08-27";     // date of the Trading 212 holdings statement
+const CASH      = 9000;             // cash held in the ISA, swept into MMFs
+const MMF       = 0.038;            // current MMF rate, used for the benchmark cash sleeve
+
+// Every subscription into the ISA. Add a line each time you pay money in.
+const FLOWS = [
+  {d:"2025-01-10", amt:20000},
+  {d:"2025-07-10", amt:20000},
+  {d:"2026-04-10", amt:20000},
+];
+
+// Benchmark: Vanguard LifeStrategy 60% Equity Fund, GBP Acc. 60/40 equities/bonds,
+// sterling-denominated, ISA-eligible, 0.20% OCF.
+// buyNav are RECONSTRUCTED from Vanguard's published trailing and calendar returns,
+// not published daily NAVs. Replace with actuals from the Vanguard price download.
+const BMK = {
+  nm:"Vanguard LifeStrategy 60% Equity",
+  short:"VGLS60A",
+  isin:"GB00B3TYHH97",
+  tk:"0P0000TKZK.L",          // Yahoo symbol for the A Acc share class, quoted in GBP
+  navSnap:303.7381,           // NAV at 27 Aug 2026 (Vanguard)
+  buyNav:{"2025-01-10":253.42, "2025-07-10":265.47, "2026-04-10":289.94},
+  estimated:true
+};
+
+// ═══════════════════════════════════════════════════════════════
 // STATE
 // ═══════════════════════════════════════════════════════════════
 // FX calibrated so the snapshot total reconciles to the 27 Aug statement (£61,702.80).
 let P={...SNAP},fx={EUR:.85778,USD:.73603,GBX:.01,GBP:1},lr=null,rfg=false,rmsg="",rerr="",vw="overview";
+let bmkLive=false,bmkMode="full";   // "full" = benchmark fully invested (default), "cash" = benchmark holds a matching cash sleeve
 
 // ═══════════════════════════════════════════════════════════════
 // PRICE REFRESH via Cloudflare Worker
@@ -125,7 +172,7 @@ async function refreshPrices(){
   if(!WORKER_URL){rerr="Set your Cloudflare Worker URL above to enable live prices.";render();return;}
   rfg=true;rerr="";rmsg="Fetching live prices...";render();
   try{
-    const tks=H.map(h=>h.tk).join(",");
+    const tks=H.map(h=>h.tk).concat(BMK.tk?[BMK.tk]:[]).join(",");
     const url=`${WORKER_URL}?symbols=${encodeURIComponent(tks)}`;
     const resp=await Promise.race([
       fetch(url),
@@ -151,6 +198,16 @@ async function refreshPrices(){
         P[h.tk]=p;ok++;
       }else fail++;
     });
+    if(BMK.tk){
+      const b=data[BMK.tk];
+      if(b&&b.price>0){
+        let p=b.price;
+        if(b.currency==="GBp"||b.currency==="GBX")p/=100;
+        else if(p>BMK.navSnap*20)p/=100;          // Yahoo occasionally quotes this line in pence
+        P[BMK.tk]=p;bmkLive=true;
+      }
+      else bmkLive=false;
+    }
     if(data.__fx){
       if(data.__fx.EUR)fx.EUR=data.__fx.EUR;
       if(data.__fx.USD)fx.USD=data.__fx.USD;
@@ -186,6 +243,41 @@ function calc(){
   return{R,srt,tv,tc,td,tcp,tcpp,ttp,ttpp,dy,secs,geos,curs,t5,byR};
 }
 
+// ---- money-weighted return (XIRR) ----
+const DAY=864e5;
+function xirr(fl){
+  const f=[...fl].sort((a,b)=>a.t-b.t),t0=f[0].t;
+  const npv=r=>f.reduce((s,x)=>s+x.a/Math.pow(1+r,(x.t-t0)/(365*DAY)),0);
+  let lo=-0.9999,hi=10;
+  if(npv(lo)<0||npv(hi)>0)return null;
+  for(let i=0;i<200;i++){const m=(lo+hi)/2;npv(m)>0?lo=m:hi=m;}
+  return (lo+hi)/2;
+}
+function valDate(){return lr?new Date(lr):new Date(SNAP_DATE+"T00:00:00Z");}
+function bmkNav(){return (bmkLive&&P[BMK.tk]>0)?P[BMK.tk]:BMK.navSnap;}
+
+function irrCalc(D){
+  const vd=valDate(),nav=bmkNav();
+  const paid=FLOWS.reduce((s,f)=>s+f.amt,0);
+  const mine=D.tv+CASH;                                   // portfolio at market + cash
+  const cashW=mine>0?CASH/mine:0;                         // your cash weight today
+  const out=FLOWS.map(f=>({t:new Date(f.d+"T00:00:00Z"),a:-f.amt}));
+  const myIrr=xirr([...out,{t:vd,a:mine}]);
+
+  // benchmark, same money on the same days
+  const legs=FLOWS.map(f=>{
+    const bn=BMK.buyNav[f.d]||nav,w=bmkMode==="cash"?1-cashW:1;
+    const yrs=(vd-new Date(f.d+"T00:00:00Z"))/(365*DAY);
+    return{...f,bn,units:f.amt*w/bn,cash:f.amt*(1-w)*Math.pow(1+MMF,yrs),w};
+  });
+  const bUnits=legs.reduce((s,l)=>s+l.units,0),bCash=legs.reduce((s,l)=>s+l.cash,0);
+  const bVal=bUnits*nav+bCash;
+  const bIrr=xirr([...out,{t:vd,a:bVal}]);
+  return{vd,nav,paid,mine,cashW,myIrr,bIrr,bVal,bUnits,bCash,legs,
+         lead:(myIrr!=null&&bIrr!=null)?myIrr-bIrr:null,gain:mine-paid,bGain:bVal-paid,
+         days:Math.round((vd-new Date(FLOWS[0].d+"T00:00:00Z"))/DAY)};
+}
+
 // ═══════════════════════════════════════════════════════════════
 // RENDERING
 // ═══════════════════════════════════════════════════════════════
@@ -216,15 +308,26 @@ function render(){
     <div class="rs">${rfg?esc(rmsg):(lr?"Live via Yahoo Finance":"Using snapshot prices from 27 Aug 2026")}</div></div>`;
   if(rerr)o+=`<div class="al ${rerr.includes("fail")?"al-e":"al-w"}" style="max-width:560px;margin:0 auto 14px">${esc(rerr)}</div>`;
 
-  o+=`<div class="nav"><button class="nb ${vw==="overview"?"on":""}" onclick="vw='overview';render()">Overview</button><button class="nb ${vw==="holdings"?"on":""}" onclick="vw='holdings';render()">Holdings</button><button class="nb ${vw==="analysis"?"on":""}" onclick="vw='analysis';render()">Analysis</button></div>`;
+  o+=`<div class="nav"><button class="nb ${vw==="overview"?"on":""}" onclick="vw='overview';render()">Overview</button><button class="nb ${vw==="holdings"?"on":""}" onclick="vw='holdings';render()">Holdings</button><button class="nb ${vw==="analysis"?"on":""}" onclick="vw='analysis';render()">Analysis</button><button class="nb ${vw==="benchmark"?"on":""}" onclick="vw='benchmark';render()">Benchmark</button></div>`;
 
-  if(vw==="overview")o+=rOv(D);else if(vw==="holdings")o+=rHo(D);else o+=rAn(D);
+  if(vw==="overview")o+=rOv(D);else if(vw==="holdings")o+=rHo(D);else if(vw==="analysis")o+=rAn(D);else o+=rBm(D);
   o+=`</div><div class="ft">Built by Arnav Bagchi Chowdhury · Data from Trading 212 · Not financial advice</div>`;
   document.getElementById("app").innerHTML=o;
 }
 
 function rOv(D){
-  let o=`<div class="sg">
+  const I=irrCalc(D);
+  let o=`<div class="irr">
+    <div class="irr-m"><div class="irr-l">Annualised IRR</div>
+      <div class="irr-v" style="color:${I.myIrr==null?"var(--t3)":cl(I.myIrr)}">${I.myIrr==null?"—":pf(I.myIrr*100)}</div>
+      <div class="irr-s">Money-weighted, since ${new Date(FLOWS[0].d+"T00:00:00Z").toLocaleDateString("en-GB",{day:"numeric",month:"short",year:"numeric",timeZone:"UTC"})}</div></div>
+    <div class="irr-r">
+      <div class="irr-i"><span class="irr-ik">Contributed</span><span class="irr-iv" style="color:var(--t2)">${F(I.paid)}</span></div>
+      <div class="irr-i"><span class="irr-ik">Gain</span><span class="irr-iv" style="color:${cl(I.gain)}">${F(I.gain)}</span></div>
+      <div class="irr-i"><span class="irr-ik">vs ${BMK.short}</span><span class="irr-iv" style="color:${I.lead==null?"var(--t3)":cl(I.lead)}">${I.lead==null?"—":(I.lead>=0?"+":"")+(I.lead*100).toFixed(2)+"pp"}</span></div>
+      <div class="irr-i"><span class="irr-ik">Elapsed</span><span class="irr-iv" style="color:var(--t2)">${(I.days/365).toFixed(2)}y</span></div>
+    </div></div>`;
+  o+=`<div class="sg">
     <div class="sc"><div class="sl">Market Value</div><div class="sv" style="color:#f4f7fb">${F(D.tv)}</div><div class="ss" style="color:var(--t4)">Cost: ${F(D.tc)}</div></div>
     <div class="sc"><div class="sl">Capital P&amp;L</div><div class="sv" style="color:${cl(D.tcp)}">${F(D.tcp)}</div><div class="ss" style="color:${cl(D.tcpp)}">${pf(D.tcpp)}</div></div>
     <div class="sc"><div class="sl">Est. Annual Income</div><div class="sv" style="color:var(--bl)">${F(D.td)}</div><div class="ss" style="color:var(--t4)">Yield-based, forward</div></div>
@@ -291,6 +394,65 @@ function rAn(D){
   o+=`<div><div style="font-size:10px;color:var(--t5);text-transform:uppercase;letter-spacing:1px;margin-bottom:9px;font-weight:600">Income</div>`;
   o+=mr("Total Dividends",F(D.td),"var(--bl)")+mr("Dividend Payers",dp.length+" of "+H.length,"var(--t)")+mr("Avg Per Payer",F(D.td/Math.max(dp.length,1)),"var(--bl)")+mr("Largest Payer",esc(dp[0]?.nm||"—"),"var(--t2)")+`</div>`;
   o+=`</div></div>`;return o;
+}
+
+function rBm(D){
+  const I=irrCalc(D),inv=D.tv,cs=CASH,tot=I.mine;
+  const iw=tot>0?inv/tot*100:0,cw=tot>0?cs/tot*100:0;
+  const dstr=d=>new Date(d+"T00:00:00Z").toLocaleDateString("en-GB",{day:"2-digit",month:"short",year:"numeric",timeZone:"UTC"});
+
+  let o=`<div class="sg">
+    <div class="sc"><div class="sl">Your IRR</div><div class="sv" style="color:${I.myIrr==null?"var(--t3)":cl(I.myIrr)}">${I.myIrr==null?"—":pf(I.myIrr*100)}</div><div class="ss" style="color:var(--t4)">${F(I.mine)} today</div></div>
+    <div class="sc"><div class="sl">Benchmark IRR</div><div class="sv" style="color:var(--am)">${I.bIrr==null?"—":pf(I.bIrr*100)}</div><div class="ss" style="color:var(--t4)">${F(I.bVal)} today</div></div>
+    <div class="sc"><div class="sl">Lead</div><div class="sv" style="color:${I.lead==null?"var(--t3)":cl(I.lead)}">${I.lead==null?"—":(I.lead>=0?"+":"")+(I.lead*100).toFixed(2)+"pp"}</div><div class="ss" style="color:${cl(I.mine-I.bVal)}">${F(I.mine-I.bVal)} in cash terms</div></div>
+    <div class="sc"><div class="sl">Benchmark NAV</div><div class="sv" style="color:#f4f7fb">£${I.nav.toFixed(2)}</div><div class="ss" style="color:var(--t4)">${bmkLive?"Live":"At "+dstr(SNAP_DATE)}</div></div></div>`;
+
+  o+=`<div class="cd gf"><div class="ch"><span class="ct">Benchmark construction</span>
+    <div class="tog"><button class="${bmkMode==="full"?"on":""}" onclick="bmkMode='full';render()">Fully invested</button><button class="${bmkMode==="cash"?"on":""}" onclick="bmkMode='cash';render()">Matched cash sleeve</button></div></div>
+    <p style="font-size:12px;color:var(--t3);line-height:1.65">${esc(BMK.nm)} (${esc(BMK.short)}), 60% global equities and 40% global bonds, sterling-denominated and ISA-eligible at 0.20% OCF. ${bmkMode==="full"
+      ?`The benchmark is <b style="color:var(--t2)">fully invested</b>: all ${F(I.paid)} goes into the fund. Holding ${cw.toFixed(1)}% in cash is your own allocation decision, so its cost or benefit stays inside your number rather than being neutralised on both sides.`
+      :`The benchmark parks <b style="color:var(--t2)">${cw.toFixed(1)}% at ${(MMF*100).toFixed(1)}%</b> to mirror your cash weight. Shown for reference only; the fully invested version is the live comparison.`}</p></div>`;
+
+  o+=`<div class="g2"><div class="cd"><div class="ch"><span class="ct">Where your money sits</span><span class="cb">${F(tot)}</span></div>
+    <div class="seg"><div style="width:${iw}%;background:var(--ac)">${iw.toFixed(0)}%</div><div style="width:${cw}%;background:var(--am)">${cw.toFixed(0)}%</div></div>
+    <div class="pr"><div class="psw" style="background:var(--ac)"></div><span class="pn">Invested</span><span class="pp">${iw.toFixed(1)}%</span><span class="pv">${F(inv)}</span></div>
+    <div class="pr"><div class="psw" style="background:var(--am)"></div><span class="pn">Cash in MMFs</span><span class="pp">${cw.toFixed(1)}%</span><span class="pv">${F(cs)}</span></div>
+    <div class="mr" style="margin-top:10px"><span class="mr-l">Cash earning</span><span class="mr-v" style="color:var(--am)">${(MMF*100).toFixed(2)}%</span></div>
+    <div class="mr"><span class="mr-l">Annualised on cash</span><span class="mr-v" style="color:var(--am)">${F(cs*MMF)}</span></div></div>`;
+
+  o+=`<div class="cd"><div class="ch"><span class="ct">Growth of ${F(I.paid)}</span></div>`;
+  const mx=Math.max(I.mine,I.bVal,I.paid);
+  [["Contributed",I.paid,"rgba(134,148,170,.3)","var(--t3)"],["Benchmark",I.bVal,"rgba(229,165,75,.32)","var(--am)"],["Your portfolio",I.mine,"rgba(99,210,195,.32)","var(--ac)"]].forEach(([l,v,bg,c])=>{
+    o+=`<div class="br"><div class="bl">${l}</div><div class="bt"><div class="bf" style="width:${v/mx*100}%;background:${bg}"></div></div><div class="bv" style="color:${c}">${F(v)}</div></div>`;});
+  o+=`<div class="mr" style="margin-top:12px"><span class="mr-l">Your gain</span><span class="mr-v" style="color:${cl(I.gain)}">${F(I.gain)}</span></div>
+    <div class="mr"><span class="mr-l">Benchmark gain</span><span class="mr-v" style="color:var(--am)">${F(I.bGain)}</span></div>
+    <div class="mr"><span class="mr-l">Difference</span><span class="mr-v" style="color:${cl(I.gain-I.bGain)}">${F(I.gain-I.bGain)}</span></div></div></div>`;
+
+  o+=`<div class="cd gf"><div class="ch"><span class="ct">Cash flows</span><span class="cb">${FLOWS.length} subscriptions</span></div><div class="tw"><table><thead><tr>`;
+  ["Date","Paid in","Days held","Bmk NAV","To fund","To cash","Units"].forEach(x=>o+=`<th>${x}</th>`);
+  o+=`</tr></thead><tbody>`;
+  I.legs.forEach(l=>{
+    const dh=Math.round((I.vd-new Date(l.d+"T00:00:00Z"))/DAY);
+    o+=`<tr><td style="color:var(--t2);font-weight:500">${dstr(l.d)}</td>
+      <td style="font-family:var(--mono);font-size:10.5px">${F(l.amt)}</td>
+      <td style="font-family:var(--mono);font-size:10.5px;color:var(--t3)">${dh}</td>
+      <td style="font-family:var(--mono);font-size:10.5px;color:var(--t3)">£${l.bn.toFixed(2)}${BMK.estimated?'<span style="color:var(--am)">*</span>':''}</td>
+      <td style="font-family:var(--mono);font-size:10.5px">${F(l.amt*l.w)}</td>
+      <td style="font-family:var(--mono);font-size:10.5px;color:${l.amt*(1-l.w)>0?"var(--am)":"var(--t5)"}">${l.amt*(1-l.w)>0?F(l.amt*(1-l.w)):"—"}</td>
+      <td style="font-family:var(--mono);font-size:10.5px;color:var(--t3)">${l.units.toFixed(3)}</td></tr>`;});
+  o+=`</tbody><tfoot><tr><td style="color:var(--t3);font-size:11px">TOTAL</td>
+    <td style="font-family:var(--mono);font-size:11.5px">${F(I.paid)}</td><td></td><td></td>
+    <td style="font-family:var(--mono);font-size:11.5px">${F(I.legs.reduce((s,l)=>s+l.amt*l.w,0))}</td>
+    <td style="font-family:var(--mono);font-size:11.5px;color:var(--am)">${I.bCash>0?F(I.legs.reduce((s,l)=>s+l.amt*(1-l.w),0)):"—"}</td>
+    <td style="font-family:var(--mono);font-size:11.5px;color:var(--t3)">${I.bUnits.toFixed(3)}</td></tr></tfoot></table></div>`;
+
+  o+=`<p class="note">IRR is money-weighted, so both sides are measured on the same three payment dates and neither is flattered by when the money went in. The benchmark buys ${esc(BMK.short)} on each of those dates${bmkMode==="cash"?` and parks the matching cash slice at ${(MMF*100).toFixed(1)}%`:``}, then holds.
+  ${BMK.estimated?`<br><span style="color:var(--am)">* The three purchase NAVs are reconstructed from Vanguard's published trailing and calendar-year returns rather than daily NAVs, so each could be out by a percent or two. Replace <code style="color:var(--ac)">BMK.buyNav</code> with actuals from Vanguard's price download to firm this up.</span>`:``}
+  <br>${bmkLive
+    ?`NAV is live from <code style="color:var(--ac)">${esc(BMK.tk)}</code>. As an unlisted OEIC the fund prices once daily at its valuation point, so this NAV can be a session behind your holdings.`
+    :`NAV held at the ${dstr(SNAP_DATE)} close of £${BMK.navSnap.toFixed(4)}. Hit refresh to pull the live NAV from <code style="color:var(--ac)">${esc(BMK.tk)}</code>.`}
+  <br>The benchmark is 60/40 equities and bonds with no commodities, so your gold and silver sit outside it entirely. Your equity weight also runs above the fund's, which accounts for part of any lead.</p></div>`;
+  return o;
 }
 
 render();
